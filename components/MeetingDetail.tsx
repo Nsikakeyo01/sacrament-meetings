@@ -52,22 +52,29 @@ export default function MeetingDetail({
           <p>
             <strong>Presiding:</strong> {meeting.presiding}
           </p>
+
           <p>
             <strong>Conducting:</strong> {meeting.conducting}
           </p>
         </div>
       </section>
 
-      {meeting.announcements && (
-        <section className="mb-8 rounded-lg bg-blue-50 p-5 print:bg-white">
-          <h2 className="mb-3 text-xl font-bold text-blue-900">
-            Announcements
-          </h2>
-          <p className="whitespace-pre-line text-slate-700">
-            {meeting.announcements}
-          </p>
-        </section>
-      )}
+      {meeting.announcements &&
+        meeting.announcements.length > 0 && (
+          <section className="mb-8 rounded-lg bg-blue-50 p-5 print:bg-white">
+            <h2 className="mb-3 text-xl font-bold text-blue-900">
+              Announcements
+            </h2>
+
+            <ul className="list-disc space-y-2 pl-5 text-slate-700">
+              {meeting.announcements.map(
+                (announcement, index) => (
+                  <li key={index}>{announcement}</li>
+                )
+              )}
+            </ul>
+          </section>
+        )}
 
       <section className="mb-8">
         <h2 className="mb-4 text-xl font-bold text-blue-900">
@@ -77,7 +84,8 @@ export default function MeetingDetail({
         <div className="space-y-3">
           <p>
             <strong>Opening Hymn:</strong>{" "}
-            {meeting.openingHymn.title} (#{meeting.openingHymn.number})
+            {meeting.openingHymn.title} (#
+            {meeting.openingHymn.number})
           </p>
 
           <p>
@@ -93,13 +101,9 @@ export default function MeetingDetail({
             Ward Business
           </h2>
 
-          <ul className="list-disc space-y-2 pl-6 text-slate-700">
+          <ul className="list-disc space-y-2 pl-5 text-slate-700">
             {meeting.wardBusiness.map((item, index) => (
-              <li key={index}>
-                {typeof item === "string"
-                  ? item
-                  : JSON.stringify(item)}
-              </li>
+              <li key={index}>{item.description}</li>
             ))}
           </ul>
         </section>
@@ -110,8 +114,9 @@ export default function MeetingDetail({
           <h2 className="mb-4 text-xl font-bold text-blue-900">
             Stake Business
           </h2>
+
           <p className="text-slate-700">
-            Stake business will be conducted as part of this meeting.
+            Stake business will be conducted during this meeting.
           </p>
         </section>
       )}
@@ -123,28 +128,42 @@ export default function MeetingDetail({
 
         <p>
           <strong>Sacrament Hymn:</strong>{" "}
-          {meeting.sacramentHymn.title} (#{meeting.sacramentHymn.number})
+          {meeting.sacramentHymn.title} (#
+          {meeting.sacramentHymn.number})
         </p>
       </section>
 
       {meeting.speakers.length > 0 && (
         <section className="mb-8">
           <h2 className="mb-4 text-xl font-bold text-blue-900">
-            Speakers
+            Speakers and Musical Numbers
           </h2>
 
-          <ul className="space-y-3">
+          <div className="space-y-4">
             {meeting.speakers.map((speaker, index) => (
-              <li
+              <div
                 key={index}
-                className="rounded-lg border border-slate-200 p-4 print:border-0 print:p-1"
+                className="rounded-lg border border-slate-200 bg-slate-50 p-4 print:border-0 print:bg-white print:p-1"
               >
-                {typeof speaker === "string"
-                  ? speaker
-                  : JSON.stringify(speaker)}
-              </li>
+                <p className="font-semibold text-slate-900">
+                  {speaker.type === "musical-number"
+                    ? "Musical Number"
+                    : "Speaker"}
+                  : {speaker.name}
+                </p>
+
+                <p className="mt-2 text-sm text-slate-600">
+                  <strong>
+                    {speaker.type === "musical-number"
+                      ? "Selection"
+                      : "Topic"}
+                    :
+                  </strong>{" "}
+                  {speaker.topic}
+                </p>
+              </div>
             ))}
-          </ul>
+          </div>
         </section>
       )}
 
@@ -156,7 +175,8 @@ export default function MeetingDetail({
         <div className="space-y-3">
           <p>
             <strong>Closing Hymn:</strong>{" "}
-            {meeting.closingHymn.title} (#{meeting.closingHymn.number})
+            {meeting.closingHymn.title} (#
+            {meeting.closingHymn.number})
           </p>
 
           <p>
