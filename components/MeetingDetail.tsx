@@ -25,6 +25,7 @@ export default function MeetingDetail({
     testimony: "Fast and Testimony Meeting",
     stake: "Stake Conference",
     general: "General Conference",
+    special: "Special Sacrament Meeting",
   };
 
   return (

@@ -17,10 +17,16 @@ export async function generateMetadata({
     const { id } = await params;
     const meetingId = Number(id);
 
-    const meeting =
-        Number.isInteger(meetingId) && meetingId > 0
-            ? getMeetingById(meetingId)
-            : undefined;
+    if (
+        !/^[1-9]\d*$/.test(id) ||
+        !Number.isSafeInteger(meetingId)
+    ) {
+        return {
+            title: "Meeting Not Found | Sacrament Meeting Planner",
+        };
+    }
+
+    const meeting = await getMeetingById(meetingId);
 
     if (!meeting) {
         return {
@@ -40,11 +46,15 @@ export default async function MeetingPage({
     const { id } = await params;
     const meetingId = Number(id);
 
-    if (!/^\d+$/.test(id) || !Number.isSafeInteger(meetingId) || meetingId <= 0) {
+    if (
+        !/^[1-9]\d*$/.test(id) ||
+        !Number.isSafeInteger(meetingId)
+    ) {
         notFound();
     }
 
-    const meeting = getMeetingById(meetingId);
+    // Retrieve meeting details from Neon PostgreSQL
+    const meeting = await getMeetingById(meetingId);
 
     if (!meeting) {
         notFound();
