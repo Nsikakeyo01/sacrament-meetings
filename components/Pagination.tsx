@@ -43,7 +43,10 @@ export default function Pagination({
                     Previous
                 </Link>
             ) : (
-                <span className="rounded-lg border border-slate-200 px-4 py-2 text-slate-400">
+                <span
+                    aria-disabled="true"
+                    className="rounded-lg border border-slate-300 bg-white px-4 py-2 font-medium text-slate-600"
+                >
                     Previous
                 </span>
             )}
@@ -55,6 +58,7 @@ export default function Pagination({
                 <Link
                     key={pageNumber}
                     href={createPageURL(pageNumber)}
+                    aria-label={`Page ${pageNumber}`}
                     aria-current={
                         currentPage === pageNumber
                             ? "page"
@@ -77,7 +81,10 @@ export default function Pagination({
                     Next
                 </Link>
             ) : (
-                <span className="rounded-lg border border-slate-200 px-4 py-2 text-slate-400">
+                <span
+                    aria-disabled="true"
+                    className="rounded-lg border border-slate-300 bg-white px-4 py-2 font-medium text-slate-600"
+                >
                     Next
                 </span>
             )}

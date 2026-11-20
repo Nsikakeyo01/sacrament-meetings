@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMeetingById } from "@/lib/meetings-db";
+import { updateMeeting } from "@/lib/actions";
+import MeetingForm from "@/components/MeetingForm";
 
 interface EditMeetingPageProps {
     params: Promise<{
@@ -28,55 +30,33 @@ export default async function EditMeetingPage({
         notFound();
     }
 
+    const updateMeetingAction = updateMeeting.bind(
+        null,
+        meetingId
+    );
+
     return (
-        <section className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-            <h2 className="text-2xl font-bold text-slate-900">
-                Edit Meeting Program
-            </h2>
-
-            <p className="mt-3 text-slate-600">
-                Meeting scheduled for {meeting.date}
-            </p>
-
-            <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-5">
-                <h3 className="font-semibold text-slate-900">
-                    Current Meeting Information
-                </h3>
-
-                <p className="mt-3 text-slate-700">
-                    <strong>Meeting Type:</strong>{" "}
-                    {meeting.meetingType}
-                </p>
-
-                <p className="mt-2 text-slate-700">
-                    <strong>Presiding:</strong>{" "}
-                    {meeting.presiding}
-                </p>
-
-                <p className="mt-2 text-slate-700">
-                    <strong>Conducting:</strong>{" "}
-                    {meeting.conducting}
-                </p>
-            </div>
-
-            <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-5">
-                <h3 className="font-semibold text-blue-950">
-                    Editing Available in Week 04
-                </h3>
-
-                <p className="mt-2 text-blue-900">
-                    The meeting editing form and database update
-                    functionality will be implemented in a future
-                    assignment.
-                </p>
-            </div>
-
+        <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
             <Link
                 href="/admin"
-                className="mt-8 inline-block rounded-lg bg-blue-900 px-5 py-3 font-semibold text-white hover:bg-blue-800"
+                className="text-sm font-semibold text-blue-900 hover:underline"
             >
                 Back to Admin Dashboard
             </Link>
+
+            <h1 className="mt-5 text-3xl font-bold text-slate-900">
+                Edit Meeting Program
+            </h1>
+
+            <p className="mb-8 mt-3 text-slate-600">
+                Update the sacrament meeting scheduled for{" "}
+                {meeting.date}.
+            </p>
+
+            <MeetingForm
+                meeting={meeting}
+                action={updateMeetingAction}
+            />
         </section>
     );
 }

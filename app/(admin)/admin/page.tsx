@@ -1,6 +1,7 @@
 
 import Link from "next/link";
 import { getMeetings } from "@/lib/meetings-db";
+import DeleteMeetingButton from "@/components/DeleteMeetingButton";
 
 export const dynamic = "force-dynamic";
 
@@ -59,7 +60,7 @@ export default async function AdminDashboard() {
                                 Presiding
                             </th>
                             <th scope="col" className="px-5 py-4">
-                                Action
+                                Actions
                             </th>
                         </tr>
                     </thead>
@@ -80,15 +81,32 @@ export default async function AdminDashboard() {
                                 </td>
 
                                 <td className="px-5 py-4">
-                                    <Link
-                                        href={`/admin/meetings/${meeting.id}/edit`}
-                                        className="font-semibold text-blue-900 hover:underline"
-                                    >
-                                        Edit
-                                    </Link>
+                                    <div className="flex items-center gap-4">
+                                        <Link
+                                            href={`/admin/meetings/${meeting.id}/edit`}
+                                            className="font-semibold text-blue-900 hover:underline"
+                                        >
+                                            Edit
+                                        </Link>
+
+                                        <DeleteMeetingButton
+                                            meetingId={meeting.id}
+                                        />
+                                    </div>
                                 </td>
                             </tr>
                         ))}
+
+                        {meetings.length === 0 && (
+                            <tr>
+                                <td
+                                    colSpan={4}
+                                    className="px-5 py-8 text-center text-slate-600"
+                                >
+                                    No meetings have been created yet.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
