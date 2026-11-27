@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { getMeetingById } from "@/lib/meetings-db";
 
@@ -7,7 +6,7 @@ interface RouteContext {
 }
 
 export async function GET(
-    request: Request,
+    _request: Request,
     context: RouteContext
 ) {
     try {
@@ -31,7 +30,6 @@ export async function GET(
             );
         }
 
-        // Retrieve the meeting from Neon PostgreSQL
         const meeting = await getMeetingById(meetingId);
 
         if (!meeting) {
@@ -42,6 +40,7 @@ export async function GET(
         }
 
         return NextResponse.json(meeting, { status: 200 });
+
     } catch (error) {
         console.error("Error fetching meeting:", error);
 
