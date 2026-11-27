@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import MeetingCard from "@/components/MeetingCard";
 import MeetingSearch from "@/components/MeetingSearch";
@@ -6,9 +5,9 @@ import Pagination from "@/components/Pagination";
 import { getMeetings } from "@/lib/meetings-db";
 
 export const metadata: Metadata = {
-    title: "All Meetings | Sacrament Meeting Planner",
+    title: "All Meetings",
     description:
-        "Browse and search sacrament meeting programs, dates, hymns, and speaker assignments.",
+        "Browse and search sacrament meeting programs, dates, hymns, prayers, and speaker assignments.",
 };
 
 interface MeetingsPageProps {
@@ -29,10 +28,8 @@ export default async function MeetingsPage({
 
     const requestedPage = Number(params.page ?? "1");
 
-    // Retrieve meeting records from Neon PostgreSQL.
     const meetings = await getMeetings();
 
-    // Filter meetings based on the search query.
     const filteredMeetings = meetings.filter((meeting) => {
         const searchableText = [
             meeting.date,
@@ -53,7 +50,6 @@ export default async function MeetingsPage({
         return searchableText.includes(query);
     });
 
-    // Calculate pagination.
     const totalPages = Math.ceil(
         filteredMeetings.length / ITEMS_PER_PAGE
     );
@@ -71,7 +67,7 @@ export default async function MeetingsPage({
     );
 
     return (
-        <main className="flex-1">
+        <div className="flex-1">
             <section className="bg-blue-950 px-6 py-14 text-white">
                 <div className="mx-auto max-w-5xl">
                     <h1 className="text-3xl font-bold md:text-4xl">
@@ -95,9 +91,7 @@ export default async function MeetingsPage({
 
                         <p className="mt-2 text-slate-600">
                             {filteredMeetings.length} meeting
-                            {filteredMeetings.length === 1
-                                ? ""
-                                : "s"}{" "}
+                            {filteredMeetings.length === 1 ? "" : "s"}{" "}
                             available
                         </p>
                     </div>
@@ -134,6 +128,6 @@ export default async function MeetingsPage({
                     </div>
                 )}
             </section>
-        </main>
+        </div>
     );
 }

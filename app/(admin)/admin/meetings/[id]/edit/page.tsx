@@ -1,9 +1,15 @@
-
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMeetingById } from "@/lib/meetings-db";
 import { updateMeeting } from "@/lib/actions";
 import MeetingForm from "@/components/MeetingForm";
+import { requireAuth } from "@/lib/require-auth";
+
+export const metadata: Metadata = {
+    title: "Edit Meeting",
+    description: "Update an existing sacrament meeting program.",
+};
 
 interface EditMeetingPageProps {
     params: Promise<{
@@ -14,6 +20,8 @@ interface EditMeetingPageProps {
 export default async function EditMeetingPage({
     params,
 }: EditMeetingPageProps) {
+    await requireAuth();
+
     const { id } = await params;
     const meetingId = Number(id);
 

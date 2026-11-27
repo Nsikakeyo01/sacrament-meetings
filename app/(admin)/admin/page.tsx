@@ -1,11 +1,20 @@
-
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getMeetings } from "@/lib/meetings-db";
 import DeleteMeetingButton from "@/components/DeleteMeetingButton";
+import { requireAuth } from "@/lib/require-auth";
 
 export const dynamic = "force-dynamic";
 
+export const metadata: Metadata = {
+    title: "Admin Dashboard",
+    description:
+        "Manage and organize sacrament meeting programs.",
+};
+
 export default async function AdminDashboard() {
+    await requireAuth();
+
     const meetings = await getMeetings();
 
     return (
@@ -53,12 +62,15 @@ export default async function AdminDashboard() {
                             <th scope="col" className="px-5 py-4">
                                 Date
                             </th>
+
                             <th scope="col" className="px-5 py-4">
                                 Meeting Type
                             </th>
+
                             <th scope="col" className="px-5 py-4">
                                 Presiding
                             </th>
+
                             <th scope="col" className="px-5 py-4">
                                 Actions
                             </th>

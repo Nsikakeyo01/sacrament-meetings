@@ -1,9 +1,9 @@
-
 "use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { requireAuth } from "@/lib/require-auth";
 
 import {
     createMeeting as insertMeeting,
@@ -12,10 +12,7 @@ import {
 } from "@/lib/meetings-db";
 
 import { meetingSchema } from "@/lib/meeting-schema";
-
-import type {
-    MeetingActionState,
-} from "@/lib/action-state";
+import type { MeetingActionState } from "@/lib/action-state";
 
 function getFieldErrors(
     error: z.ZodError
@@ -43,18 +40,12 @@ function getText(
 }
 
 function parseMeetingForm(formData: FormData) {
-    const announcements = getText(
-        formData,
-        "announcements"
-    )
+    const announcements = getText(formData, "announcements")
         .split("\n")
         .map((item) => item.trim())
         .filter(Boolean);
 
-    const wardBusiness = getText(
-        formData,
-        "wardBusiness"
-    )
+    const wardBusiness = getText(formData, "wardBusiness")
         .split("\n")
         .map((description) => description.trim())
         .filter(Boolean)
@@ -85,41 +76,23 @@ function parseMeetingForm(formData: FormData) {
     const rawValues = {
         date: getText(formData, "date"),
 
-        meetingType: getText(
-            formData,
-            "meetingType"
-        ),
+        meetingType: getText(formData, "meetingType"),
 
-        presiding: getText(
-            formData,
-            "presiding"
-        ),
+        presiding: getText(formData, "presiding"),
 
-        conducting: getText(
-            formData,
-            "conducting"
-        ),
+        conducting: getText(formData, "conducting"),
 
         announcements,
 
         openingHymn: {
             number: Number(
-                getText(
-                    formData,
-                    "openingHymnNumber"
-                )
+                getText(formData, "openingHymnNumber")
             ),
 
-            title: getText(
-                formData,
-                "openingHymnTitle"
-            ),
+            title: getText(formData, "openingHymnTitle"),
         },
 
-        openingPrayer: getText(
-            formData,
-            "openingPrayer"
-        ),
+        openingPrayer: getText(formData, "openingPrayer"),
 
         wardBusiness,
 
@@ -128,50 +101,30 @@ function parseMeetingForm(formData: FormData) {
 
         sacramentHymn: {
             number: Number(
-                getText(
-                    formData,
-                    "sacramentHymnNumber"
-                )
+                getText(formData, "sacramentHymnNumber")
             ),
 
-            title: getText(
-                formData,
-                "sacramentHymnTitle"
-            ),
+            title: getText(formData, "sacramentHymnTitle"),
         },
 
         speakers,
 
         closingHymn: {
             number: Number(
-                getText(
-                    formData,
-                    "closingHymnNumber"
-                )
+                getText(formData, "closingHymnNumber")
             ),
 
-            title: getText(
-                formData,
-                "closingHymnTitle"
-            ),
+            title: getText(formData, "closingHymnTitle"),
         },
 
-        closingPrayer: getText(
-            formData,
-            "closingPrayer"
-        ),
+        closingPrayer: getText(formData, "closingPrayer"),
     };
 
     return meetingSchema.safeParse(rawValues);
 }
 
-function isDuplicateDate(
-    error: unknown
-): boolean {
-    if (
-        typeof error !== "object" ||
-        error === null
-    ) {
+function isDuplicateDate(error: unknown): boolean {
+    if (typeof error !== "object" || error === null) {
         return false;
     }
 
@@ -200,17 +153,14 @@ export async function createMeeting(
     _previousState: MeetingActionState,
     formData: FormData
 ): Promise<MeetingActionState> {
+    await requireAuth();
+
     const result = parseMeetingForm(formData);
 
     if (!result.success) {
         return {
-            message:
-                "Please correct the errors below.",
-
-            errors: getFieldErrors(
-                result.error
-            ),
-
+            message: "Please correct the errors below.",
+            errors: getFieldErrors(result.error),
             success: false,
         };
     }
@@ -220,28 +170,19 @@ export async function createMeeting(
     } catch (error) {
         if (isDuplicateDate(error)) {
             return {
-                message:
-                    "A meeting already exists for this date.",
-
+                message: "A meeting already exists for this date.",
                 errors: {
-                    date: [
-                        "Please choose another meeting date.",
-                    ],
+                    date: ["Please choose another meeting date."],
                 },
-
                 success: false,
             };
         }
 
-        console.error(
-            "Create meeting failed:",
-            error
-        );
+        console.error("Create meeting failed:", error);
 
         return {
             message:
                 "Unable to create the meeting. Please try again.",
-
             errors: {},
             success: false,
         };
@@ -257,10 +198,9 @@ export async function updateMeeting(
     _previousState: MeetingActionState,
     formData: FormData
 ): Promise<MeetingActionState> {
-    if (
-        !Number.isSafeInteger(id) ||
-        id <= 0
-    ) {
+    await requireAuth();
+
+    if (!Number.isSafeInteger(id) || id <= 0) {
         return {
             message: "Invalid meeting ID.",
             errors: {},
@@ -272,22 +212,14 @@ export async function updateMeeting(
 
     if (!result.success) {
         return {
-            message:
-                "Please correct the errors below.",
-
-            errors: getFieldErrors(
-                result.error
-            ),
-
+            message: "Please correct the errors below.",
+            errors: getFieldErrors(result.error),
             success: false,
         };
     }
 
     try {
-        const updated = await saveMeeting(
-            id,
-            result.data
-        );
+        const updated = await saveMeeting(id, result.data);
 
         if (!updated) {
             return {
@@ -299,28 +231,19 @@ export async function updateMeeting(
     } catch (error) {
         if (isDuplicateDate(error)) {
             return {
-                message:
-                    "Another meeting already uses this date.",
-
+                message: "Another meeting already uses this date.",
                 errors: {
-                    date: [
-                        "Please choose another meeting date.",
-                    ],
+                    date: ["Please choose another meeting date."],
                 },
-
                 success: false,
             };
         }
 
-        console.error(
-            "Update meeting failed:",
-            error
-        );
+        console.error("Update meeting failed:", error);
 
         return {
             message:
                 "Unable to update the meeting. Please try again.",
-
             errors: {},
             success: false,
         };
@@ -328,9 +251,8 @@ export async function updateMeeting(
 
     refreshMeetingPages();
 
-    revalidatePath(
-        `/admin/meetings/${id}/edit`
-    );
+    revalidatePath(`/meetings/${id}`);
+    revalidatePath(`/admin/meetings/${id}/edit`);
 
     redirect("/admin");
 }
@@ -338,28 +260,20 @@ export async function updateMeeting(
 export async function deleteMeeting(
     id: number
 ): Promise<void> {
-    if (
-        !Number.isSafeInteger(id) ||
-        id <= 0
-    ) {
-        throw new Error(
-            "Invalid meeting ID."
-        );
+    await requireAuth();
+
+    if (!Number.isSafeInteger(id) || id <= 0) {
+        throw new Error("Invalid meeting ID.");
     }
 
     try {
         const deleted = await removeMeeting(id);
 
         if (!deleted) {
-            throw new Error(
-                "Meeting not found."
-            );
+            throw new Error("Meeting not found.");
         }
     } catch (error) {
-        console.error(
-            "Delete meeting failed:",
-            error
-        );
+        console.error("Delete meeting failed:", error);
 
         throw new Error(
             "Unable to delete this meeting. Please try again."
@@ -367,6 +281,8 @@ export async function deleteMeeting(
     }
 
     refreshMeetingPages();
+
+    revalidatePath(`/meetings/${id}`);
 
     redirect("/admin");
 }
